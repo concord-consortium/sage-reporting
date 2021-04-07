@@ -1,0 +1,42 @@
+{
+  "name": "sage-reporting",
+  "version": "0.1.0",
+  "description": "Tool for education researchers to report on Sage Modeler diagram topology",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run build:live",
+    "build": "tsc -p .",
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec \"ts-node\" src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/concord-consortium/sage-reporting.git"
+  },
+  "keywords": [
+    "reporting",
+    "education",
+    "concord-consortium",
+    "modelling"
+  ],
+  "author": "npaessel@concord.org",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/concord-consortium/sage-reporting/issues"
+  },
+  "homepage": "https://github.com/concord-consortium/sage-reporting#readme",
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/node": "^14.14.37",
+    "glob": "^7.1.6",
+    "nodemon": "^2.0.7",
+    "ts-loader": "^8.1.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4",
+    "webpack": "^5.31.0"
+  },
+  "dependencies": {
+    "@types/xlsx": "0.0.36",
+    "xlsx": "^0.16.9"
+  }
+}
