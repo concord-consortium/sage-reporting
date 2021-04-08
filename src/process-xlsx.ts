@@ -12,6 +12,3 @@ export const XLSProcessor = (fileName: string) => {
   // fs.writeFileSync(outputFileName, csvString);
   XLSX.writeFile(workBook, outputFileName, { bookType: "csv"});
 };
-
-
-https://codap.concord.org/releases/latest/static/dg/en/cert/index.html?launchFromLara=eyJyZWNvcmRpZCI6NDIxNjYsImFjY2Vzc0tleXMiOnsicmVhZE9ubHkiOiJiNTE0NTllNDM1MWQ0ODcyNzIwYjk2ZjEyMjJmOWVhYWU1ODc2NzFjIn19
