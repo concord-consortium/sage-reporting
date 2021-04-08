@@ -1,6 +1,11 @@
 node_modules
 dist
-input-files
+input/*.xlsx
+input/*.csv
+output/*.csv
+output/*.xlsx
+test-input/*.csv
+test-input/*.xslx
 logs
 *.log
 tmp
