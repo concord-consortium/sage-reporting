@@ -8,7 +8,7 @@ export const XLSProcessor = (fileName: string) => {
   console.log(`XLSProcessor processing: ${fileName}`);
   const workBook = XLSX.readFile(fileName);
   const worksSheetName = workBook.SheetNames[0];
-  console.log(`converting first worksheet named "${worksSheetName}"`);
+  console.log(`   ...  converting first worksheet named "${worksSheetName}"`);
   const workSheet = workBook.Sheets[worksSheetName];
   const outputFileName = fileName.replace(/\.xlsx/i, ".csv");
 
@@ -17,5 +17,5 @@ export const XLSProcessor = (fileName: string) => {
   range.s.r = 1; // <-- zero-indexed, so setting to 1 will skip row 0
   workSheet['!ref'] = XLSX.utils.encode_range(range);
   XLSX.writeFile(workBook, outputFileName, { bookType: "csv"});
-  console.log(`→ converted to "${outputFileName}"`);
+  console.log(`   ...→ converted to "${outputFileName}"`);
 };

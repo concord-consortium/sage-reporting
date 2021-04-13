@@ -12,18 +12,15 @@ if (!fs.existsSync(outputDirectory)){
 }
 
 console.clear();
-console.log(`Working with files in ${workingDirectory}`);
-const csvFileNames = glob.sync(`${workingDirectory}/*.csv`);
+console.log(`Importing report files from ${workingDirectory}`);
 const XlsFileNames = glob.sync(`${workingDirectory}/*.xlsx`);
 
 XlsFileNames.forEach(fName => {
-  console.log(` ==> ${fName}`);
-  console.log(fName);
   XLSProcessor(fName);
 });
 
+const csvFileNames = glob.sync(`${workingDirectory}/*.csv`);
 csvFileNames.forEach(fName => {
-  console.log(` ==> ${fName}`);
   SageProcessor(fName, "output");
 });
 

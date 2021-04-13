@@ -1,12 +1,11 @@
 # sage-reporting
 Tool for education researchers to report on Sage Modeler diagram topology.
 
-
 ## How to run this:
 1. Clone this repo: `git clone git@github.com:concord-consortium/sage-reporting.git sage-reporting`
 2. Make sure you have [npm & node installed](https://www.npmjs.com/get-npm).
 2. Install node dependencies `npm install`
-3. Place your reporting sources (`*/xlsx`) into the `input` folder here.
+3. Place your reporting sources (`*/.xlsx`) into the `input` folder here.
 4. run `npm run convert`
 5. output CSV files will appear in the `output` directory here.
 
