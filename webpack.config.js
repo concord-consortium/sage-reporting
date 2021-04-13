@@ -1,5 +1,6 @@
-// 2021-04-07 -- NP: as of this moment, we are NOT building a webapp
-// This file is a placeholder.
+// 2021-04-13 -- NP: OK now we are building a simple webapp
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const webApp = {
   // webpack --mode=development
@@ -12,7 +13,7 @@ const webApp = {
       }
     ],
   },
-  entry: { index: './src/index.ts' },
+  entry: { app: './src/components/app.tsx' },
   output: {
     filename: '[name].js',
     path: __dirname + '/dist/',
@@ -22,7 +23,13 @@ const webApp = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
-  }
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "src", "components", "index.html"),
+
+    })
+  ]
 };
 
 
