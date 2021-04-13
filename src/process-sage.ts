@@ -3,13 +3,8 @@ import * as stringify from "csv-stringify/lib/sync";
 import * as fs from "fs";
 import * as base64 from "base-64";
 import fetch from "node-fetch";
-import {ITopoReport} from "./topology-tagger";
-import { indexOf } from "lodash";
+import {ITopoReport, getTopology, ISageGraph} from "./topology-tagger";
 
-// To reshape the CSV file will have to:
-// * First pass:
-// ** Identify columns that have sage models answers.
-// ** append new columns and cells to each records.
 
 // Loading data from the docstore:
 // https://github.com/concord-consortium/cloud-file-manager/blob/8757ff5f55de7155cc4aaeac9aafb2938d1b8159/src/code/providers/lara-provider.js#L123
@@ -27,12 +22,12 @@ const fetchDocStoreData = async (docId:string, key:string) => {
     redirect: 'follow', // manual, *follow, error
   });
   if (!response.ok) {
-    console.log("=======================================")
-    console.log("Failed to fetch: ")
-    console.log(response.text);
-    console.log(response.status);
-    console.log(response.statusText);
-    console.log("=======================================")
+    console.group('DocStoreError');
+    console.error(`Failed to fetch: ${url}`)
+    console.error(response.text);
+    console.error(response.status);
+    console.error(response.statusText);
+    console.groupEnd();
   }
   return response.json() // parses JSON response into native JavaScript objects
 }
@@ -60,14 +55,14 @@ interface INode {
   y: number,
   links: Array<ILink>
 }
+
+interface ISageWithOptionalTopology extends ISageGraph {
+  topology?: ITopology
+}
 interface ICodapSageModelPartial {
   componentStorage: {
     name: string,
-    savedGameState: {
-      nodes: Array<INode>,
-      links: Array<ILink>,
-      topology?: ITopology
-    }
+    savedGameState: ISageWithOptionalTopology
   }
 }
 
@@ -76,6 +71,12 @@ const processCodapItem = (key:string, item: any) => {
   item.components.forEach( (comp:ICodapSageModelPartial) => {
     if(comp.componentStorage?.savedGameState?.topology) {
       topology = comp.componentStorage.savedGameState.topology;
+    }
+    // If we don't have a topology tag, we need to add one:
+    else {
+      if(comp.componentStorage?.savedGameState) {
+        topology = getTopology(comp.componentStorage.savedGameState);
+      }
     }
   });
   return topology;
@@ -132,7 +133,6 @@ const processRecord = async (record: Record<string,any>) =>{
       }
     }
   }));
-  // resultRecord.topos = topos;
   return resultRecord;
 }
 
@@ -151,8 +151,7 @@ export const SageProcessor = async (fileName: string, outDir:string) => {
       }
     });
   });
-  // TODO: Sorting column headers breaks everything
-  // columns.sort();
+
   const lastPartOfFile = fileName.split('\\').pop().split('/').pop();
   const outPath = `${outDir}/${lastPartOfFile}`;
   console.log(`Writing final output file: → ${outPath}`);
