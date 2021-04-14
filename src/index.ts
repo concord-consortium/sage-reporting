@@ -1,8 +1,8 @@
 import { glob } from "glob";
 import * as fs from "fs";
 import * as path from "path";
-import { SageProcessor } from "./sage-file-processor";
-import { XLSProcessor } from "./process-xlsx";
+import { XSLtoCSV } from "./process-xlsx";
+import { ProcessCSVData, SuccessCount, FailCount } from "./process-sage";
 
 const workingDirectory = path.resolve("./input");
 
@@ -12,15 +12,17 @@ if (!fs.existsSync(outputDirectory)){
 }
 
 console.clear();
-console.log(`Importing report files from ${workingDirectory}`);
 const XlsFileNames = glob.sync(`${workingDirectory}/*.xlsx`);
-
-XlsFileNames.forEach(fName => {
-  XLSProcessor(fName);
+const numFiles = XlsFileNames.length;
+console.log(`Importing report ${numFiles} files from ${workingDirectory}`);
+XlsFileNames.forEach(async (fName) => {
+  console.log(`1: Reading XLSX file: ${fName}`);
+  const byteArray = fs.readFileSync(fName);
+  const csv = XSLtoCSV(byteArray);
+  const csvWithTopo = await ProcessCSVData(csv);
+  console.log(`2: Parsing complete: [${SuccessCount}✔|${FailCount}✖]`)
+  const lastPartOfFile = fName.split('\\').pop().split('/').pop();
+  const outPath = `${outputDirectory}/${lastPartOfFile.replace(/\.xlsx?/i, '.csv')}`;
+  console.log(`3: writing CSV output file: → ${outPath}`);
+  fs.writeFileSync(outPath, csvWithTopo);
 });
-
-const csvFileNames = glob.sync(`${workingDirectory}/*.csv`);
-csvFileNames.forEach(fName => {
-  SageProcessor(fName, "output");
-});
-

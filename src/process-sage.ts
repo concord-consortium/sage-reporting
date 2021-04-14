@@ -4,6 +4,8 @@ import * as base64 from "base-64";
 import fetch from "node-fetch";
 import {ITopoReport, getTopology, ISageGraph} from "./topology-tagger";
 
+export let SuccessCount = 0;
+export let FailCount = 0;
 
 const parse = Papa.parse;
 
@@ -17,18 +19,30 @@ const v2DocumentUrl = (docId:string, key:string) => {
   return `${base}/${docId}?${keyParam}`;
 }
 
+const fail = (url:string, msg:string) => {
+  console.group('DocStoreError');
+  console.error(`Failed to fetch: ${url}`)
+  console.error(msg);
+  console.groupEnd();
+  FailCount++;
+}
+
 const fetchDocStoreData = async (docId:string, key:string) => {
   const url = v2DocumentUrl(docId,key);
-  const response = await fetch(url, {
-    redirect: 'follow', // manual, *follow, error
-  });
-  if (!response.ok) {
-    console.group('DocStoreError');
-    console.error(`Failed to fetch: ${url}`)
-    console.error(response.text);
-    console.error(response.status);
-    console.error(response.statusText);
-    console.groupEnd();
+  let response = null;
+  try {
+    response = await fetch(url, {
+      redirect: 'follow', // manual, *follow, error
+    });
+  }
+  catch(e) {
+    fail(url, e);
+  }
+  if (response && !response.ok) {
+    fail(url, `${response.status} ${response.statusText}`);
+  }
+  else {
+    SuccessCount++;
   }
   return response.json() // parses JSON response into native JavaScript objects
 }
@@ -128,7 +142,8 @@ const processRecord = async (record: Record<string,any>) =>{
             }
           }
           catch(e) {
-            console.log(e);
+            console.error(e);
+            FailCount++;
           }
         }
       }
@@ -138,7 +153,7 @@ const processRecord = async (record: Record<string,any>) =>{
 }
 
 export const ProcessCSVData = async (content: Buffer|string) => {
-  const records = parse(content, {columns: true}).data;
+  const records = parse(content.toString('utf8'), {columns: true}).data;
   const newRecords = await Promise.all(records.map(processRecord));
 
   const columns:Array<string> = [];
