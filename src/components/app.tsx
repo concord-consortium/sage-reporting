@@ -2,8 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { ProcessCSVData } from "../process-sage";
 import { XSLtoCSV } from "../process-xlsx";
-// import FileDownload from "js-file-download";
-// import { CsvToHtmlTable } from "react-csv-to-table";
+
 export interface IAppProps {
   userName: string;
   place: string;
@@ -30,32 +29,62 @@ const DownloadLink = (props: IDownloadLinkProps) => {
   return(<></>);
 }
 
+interface ICSVFileRecord {
+  content: string;
+  fileName: string;
+}
 export const App = (props: IAppProps) => {
-  const [csv, setCsv] = React.useState('');
-  const [fileName, setFileName] = React.useState('');
+  const [CSVs, setCSVs] = React.useState([]);
+  const [status, setStatus] = React.useState('');
+
+  const addCSV = (csv:ICSVFileRecord) => {
+    setCSVs([...CSVs, csv]);
+    console.log(CSVs);
+  }
 
   const handleFileChange = async (event:React.ChangeEvent<HTMLInputElement>) => {
+    const csvs = [];
     if(event.target.files) {
-      const selectedFile = event.target.files.item(0);
-      const fileName = selectedFile.name;
-
-      const arrayBuff = await selectedFile.arrayBuffer()
-      const data = new Uint8Array(arrayBuff);
-      const csvString = XSLtoCSV(data);
-      const processedCsv:string = await ProcessCSVData(csvString);
-      setFileName(fileName.replace(/\.xlsx?/i, ".csv"));
-      setCsv(processedCsv);
+      for(let selectedFile of Array.from(event.target.files)) {
+        const fn = selectedFile.name.replace(/\.xlsx?/i, ".csv");
+        setStatus(`Working with ${fn}`);
+        const arrayBuff = await selectedFile.arrayBuffer();
+        const data = new Uint8Array(arrayBuff);
+        const csvString = XSLtoCSV(data);
+        const content = await ProcessCSVData(csvString, (msg:string)=> {setStatus(`${fn} ${msg}`)});
+        const processedCsv:ICSVFileRecord = {content, fileName:fn};
+        csvs.push(processedCsv);
+      }
     }
+    setCSVs(csvs);
+    setStatus('Complete.');
   }
 
   return(
     <>
       <h1>
-        Hi {props.userName} from React! Welcome to {props.place}!
+        Sage Model Topology Report Generator.
       </h1>
-      <input type="file" id="input" onChange={handleFileChange}/>
-      <DownloadLink csvString={csv} fileName={fileName} />
-      {/* <CsvToHtmlTable data={csv} csvDelimiter="," /> */}
+
+      <h2>Instructions:</h2>
+      <div className="instructions">
+        <ol>
+          <li>Select one or more ".xlsx" files from your computer by clicking the "Choose Files" button.</li>
+          <li>Wait for the processing to complete, then click on the generated download links.</li>
+        </ol>
+      </div>
+
+      <hr/>
+      <input type="file" id="input" multiple={true} accept=".xlsx" onChange={handleFileChange}/>
+      {
+        CSVs.map( (csv:ICSVFileRecord) => {
+          return <DownloadLink key={csv.fileName} csvString={csv.content} fileName={csv.fileName} />
+        })
+      }
+
+      <div className="status">
+        {status}
+      </div>
     </>
   );
 };

@@ -6,7 +6,10 @@ import {ITopoReport, getTopology, ISageGraph} from "./topology-tagger";
 
 export let SuccessCount = 0;
 export let FailCount = 0;
-
+export const ResetCounts = () => {
+  SuccessCount = 0;
+  FailCount = 0;
+}
 const parse = Papa.parse;
 
 // Loading data from the docstore:
@@ -19,6 +22,7 @@ const v2DocumentUrl = (docId:string, key:string) => {
   return `${base}/${docId}?${keyParam}`;
 }
 
+// Something bad happened, we should report on it:
 const fail = (url:string, msg:string) => {
   console.group('DocStoreError');
   console.error(`Failed to fetch: ${url}`)
@@ -152,10 +156,20 @@ const processRecord = async (record: Record<string,any>) =>{
   return resultRecord;
 }
 
-export const ProcessCSVData = async (content: Buffer|string) => {
+export const ProcessCSVData = async (content: Buffer|string, callback?: (string)=>void) => {
   const records = parse(content.toString('utf8'), {columns: true}).data;
-  const newRecords = await Promise.all(records.map(processRecord));
+  const count = records.length;
+  let completed = 0;
+  const process = async (record) => {
+    const result = await processRecord(record)
+    completed++;
+    if(callback) {
+        callback(`${completed}/${count}`);
+    }
+    return result;
+  };
 
+  const newRecords = await Promise.all(records.map(process));
   const columns:Array<string> = [];
   newRecords.forEach( (r:any) => {
     Object.keys(r).forEach(k => {

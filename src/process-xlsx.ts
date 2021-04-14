@@ -8,7 +8,6 @@ import * as XLSX from 'xlsx';
 export const XSLtoCSV = (data:Uint8Array) => {
   const workBook = XLSX.read(data,{type: 'array'});
   const worksSheetName = workBook.SheetNames[0];
-  console.log(`   ...  converting first worksheet named "${worksSheetName}"`);
   const workSheet = workBook.Sheets[worksSheetName];
 
   /* skip the first row */
@@ -19,11 +18,10 @@ export const XSLtoCSV = (data:Uint8Array) => {
   return csvString;
 }
 
-export const XLSProcessor = (fileName: string) => {
+const XLSProcessor = (fileName: string) => {
   console.log(`XLSProcessor processing: ${fileName}`);
   const workBook = XLSX.readFile(fileName);
   const worksSheetName = workBook.SheetNames[0];
-  console.log(`   ...  converting first worksheet named "${worksSheetName}"`);
   const workSheet = workBook.Sheets[worksSheetName];
   const outputFileName = fileName.replace(/\.xlsx/i, ".csv");
 
