@@ -1,7 +1,7 @@
 import { glob } from "glob";
 import * as fs from "fs";
 import * as path from "path";
-import { SageProcessor } from "./process-sage";
+import { SageProcessor } from "./sage-file-processor";
 import { XLSProcessor } from "./process-xlsx";
 
 const workingDirectory = path.resolve("./input");

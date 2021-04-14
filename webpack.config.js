@@ -1,7 +1,7 @@
 // 2021-04-13 -- NP: OK now we are building a simple webapp
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-
+const webpack = require('webpack');
 const webApp = {
   // webpack --mode=development
   module: {
@@ -22,13 +22,18 @@ const webApp = {
     contentBase: __dirname + '/dist/',
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js'],
+    // fallback: {
+    //   "stream": require.resolve("stream-browserify")
+    // }
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src", "components", "index.html"),
-
-    })
+    }),
+    // new webpack.ProvidePlugin({
+    //   Buffer: "buffer"
+    // })
   ]
 };
 

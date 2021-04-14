@@ -1,10 +1,11 @@
-import * as parse from "csv-parse/lib/sync";
-import * as stringify from "csv-stringify/lib/sync";
-import * as fs from "fs";
+import * as Papa from "papaparse";
+
 import * as base64 from "base-64";
 import fetch from "node-fetch";
 import {ITopoReport, getTopology, ISageGraph} from "./topology-tagger";
 
+
+const parse = Papa.parse;
 
 // Loading data from the docstore:
 // https://github.com/concord-consortium/cloud-file-manager/blob/8757ff5f55de7155cc4aaeac9aafb2938d1b8159/src/code/providers/lara-provider.js#L123
@@ -136,11 +137,8 @@ const processRecord = async (record: Record<string,any>) =>{
   return resultRecord;
 }
 
-export const SageProcessor = async (fileName: string, outDir:string) => {
-  console.log(`SageProcessor processing: ${fileName}`);
-  let content:Buffer|string = await fs.readFileSync(fileName);
-
-  const records = parse(content, {columns: true});
+export const ProcessCSVData = async (content: Buffer|string) => {
+  const records = parse(content, {columns: true}).data;
   const newRecords = await Promise.all(records.map(processRecord));
 
   const columns:Array<string> = [];
@@ -151,14 +149,5 @@ export const SageProcessor = async (fileName: string, outDir:string) => {
       }
     });
   });
-
-  const lastPartOfFile = fileName.split('\\').pop().split('/').pop();
-  const outPath = `${outDir}/${lastPartOfFile}`;
-  console.log(`Writing final output file: → ${outPath}`);
-  await fs.writeFileSync(outPath, stringify(newRecords,
-    {
-      columns: columns,
-      header: true
-    }
-  ));
-};
+  return Papa.unparse(newRecords,{ columns: columns, header: true});
+}

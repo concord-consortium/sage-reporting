@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { ProcessCSVData } from "../process-sage";
 import { XSLtoCSV } from "../process-xlsx";
 // import FileDownload from "js-file-download";
 // import { CsvToHtmlTable } from "react-csv-to-table";
@@ -41,9 +42,9 @@ export const App = (props: IAppProps) => {
       const arrayBuff = await selectedFile.arrayBuffer()
       const data = new Uint8Array(arrayBuff);
       const csvString = XSLtoCSV(data);
+      const processedCsv:string = await ProcessCSVData(csvString);
       setFileName(fileName.replace(/\.xlsx?/i, ".csv"));
-      setCsv(csvString);
-      // FileDownload(csvString, "out.csv");
+      setCsv(processedCsv);
     }
   }
 
