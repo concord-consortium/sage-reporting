@@ -8,7 +8,7 @@ Tool for education researchers to report on Sage Modeler diagram topology.
 3. Place your reporting sources (`*/.xlsx`) into the `input` folder here.
 4. run `npm run convert`
 5. output CSV files will appear in the `output` directory here.
-
+6. you can also try running it from github pages; https://concord-consortium.github.io/sage-reporting/
 
 ## How to develop:
 1. Follow the above instructions.
