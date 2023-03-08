@@ -17,9 +17,8 @@ const parse = Papa.parse;
 
 // @see: https://github.com/concord-consortium/cloud-file-manager/blob/8757ff5f55de7155cc4aaeac9aafb2938d1b8159/src/code/providers/document-store-url.js#L64
 const v2DocumentUrl = (docId:string, key:string) => {
-  const base = `https://document-store.concord.org/v2/documents`;
-  const keyParam = `accessKey=RO::${key}`;
-  return `${base}/${docId}?${keyParam}`;
+  const base = `https://models-resources.concord.org/legacy-document-store/`;
+  return `${base}/${docId}`;
 }
 
 // Something bad happened, we should report on it:
